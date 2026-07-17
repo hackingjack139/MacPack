@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MacPack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="noise"></div>
+    <main class="shell">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Mac setup, compressed.</p>
+          <h1>
+            Pack your
+            <span>Mac</span>
+            in minutes.
+          </h1>
+          <p class="subcopy">
+            Pick your apps once. MacPack builds one clean install flow for fresh
+            machines, team laptops, and power-user setups.
+          </p>
+          <div class="hero-actions">
+            <a href="#builder" class="button button-primary">Build your pack</a>
+            <a href="#why" class="button button-secondary">See how it works</a>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="terminal">
+            <div class="terminal-bar">
+              <span></span><span></span><span></span>
+            </div>
+            <pre id="terminal-output">brew install --cask
+  arc
+  discord
+  figma
+  notion
+  spotify
+  visual-studio-code</pre>
+          </div>
+          <div class="stat-grid">
+            <article>
+              <strong id="stat-count">6</strong>
+              <span>apps packed</span>
+            </article>
+            <article>
+              <strong>1</strong>
+              <span>install flow</span>
+            </article>
+            <article>
+              <strong>~8m</strong>
+              <span>fresh setup</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="feature-strip" id="why">
+        <article>
+          <h2>One pick list</h2>
+          <p>No tab chaos. No remembering which tools you forgot last time.</p>
+        </article>
+        <article>
+          <h2>Homebrew-first</h2>
+          <p>Fast, scriptable installs with room for direct-download fallbacks.</p>
+        </article>
+        <article>
+          <h2>Preset-ready</h2>
+          <p>Personal pack, designer pack, dev pack, or whole-team starter pack.</p>
+        </article>
+      </section>
+
+      <section class="builder" id="builder">
+        <div class="builder-head">
+          <p class="eyebrow">Prototype builder</p>
+          <h2>Choose apps. MacPack writes command.</h2>
+          <p class="subcopy builder-copy">
+            Pick your stack, then copy or download full setup script for fresh
+            Macs.
+          </p>
+        </div>
+
+        <section class="preset-strip" aria-labelledby="preset-title">
+          <div class="preset-copy">
+            <p class="eyebrow">Quick start presets</p>
+            <h3 id="preset-title">Start from proven Mac setups.</h3>
+          </div>
+          <div class="preset-grid" id="preset-grid"></div>
+        </section>
+
+        <div class="builder-toolbar">
+          <label class="search-field" for="search-input">
+            <span>Search apps</span>
+            <input
+              id="search-input"
+              type="search"
+              placeholder="Arc, Figma, Docker..."
+              autocomplete="off"
+            />
+          </label>
+          <div class="filter-group" id="filter-group" aria-label="App categories"></div>
+        </div>
+
+        <div class="builder-grid">
+          <div class="catalog" id="catalog"></div>
+
+          <aside class="selection-panel">
+            <div class="selection-header">
+              <h3>Your pack</h3>
+              <button id="clear-button" class="ghost-button">Clear</button>
+            </div>
+            <ul id="selection-list" class="selection-list"></ul>
+            <div class="command-card">
+              <div class="command-head">
+                <p class="label">Generated setup script</p>
+                <div class="command-actions">
+                  <button id="copy-button" class="ghost-button" type="button">
+                    Copy script
+                  </button>
+                  <button id="download-button" class="button button-primary" type="button">
+                    Download .sh
+                  </button>
+                </div>
+              </div>
+              <pre id="command-output">#!/usr/bin/env bash</pre>
+              <p id="status-message" class="status-message" aria-live="polite"></p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
