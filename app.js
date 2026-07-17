@@ -380,7 +380,7 @@ const apps = [
     slug: "docker",
     category: "Dev",
     description: "Container tools for local app stacks.",
-    install: { kind: "cask", package: "docker" },
+    install: { kind: "cask", package: "docker-desktop" },
     homepage: "https://www.docker.com",
   },
   {
@@ -436,7 +436,7 @@ const apps = [
     slug: "linear",
     category: "Productivity",
     description: "Issue tracking with fast keyboard flow and clean triage.",
-    install: { kind: "cask", package: "linear-linear" },
+    install: { kind: "cask", package: "linear" },
     homepage: "https://linear.app",
   },
   {
@@ -444,7 +444,7 @@ const apps = [
     slug: "todoist",
     category: "Productivity",
     description: "Task manager for quick capture, planning, and recurring work.",
-    install: { kind: "cask", package: "todoist" },
+    install: { kind: "cask", package: "todoist-app" },
     homepage: "https://todoist.com",
   },
   {
