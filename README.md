@@ -34,4 +34,4 @@ First version focuses on three things:
 
 ## Current Prototype
 
-Open [index.html](/Users/manzil/Documents/Codex/2026-05-16/caveman-users-manzil-agents-skills-caveman/index.html) in browser to view first concept.
+Open [index.html](index.html) in browser to view first concept.
