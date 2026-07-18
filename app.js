@@ -699,6 +699,7 @@ const iconMap = {
 const storageKey = "macpack-selection";
 const searchKey = "macpack-search";
 const filterKey = "macpack-filter";
+const packsKey = "macpack-packs";
 
 const selected = new Set(loadSelection());
 const categories = ["All", ...new Set(apps.map((app) => app.category))];
@@ -717,6 +718,10 @@ const filterGroup = document.querySelector("#filter-group");
 const statusMessage = document.querySelector("#status-message");
 const statCountNode = document.querySelector("#stat-count");
 const presetGrid = document.querySelector("#preset-grid");
+const saveButton = document.querySelector("#save-button");
+const savedListNode = document.querySelector("#saved-list");
+
+let savedPacks = loadPacks();
 
 function loadStoredValue(key, fallback) {
   try {
@@ -747,6 +752,42 @@ function loadSelection() {
 function saveSelection() {
   try {
     localStorage.setItem(storageKey, JSON.stringify([...selected]));
+  } catch {
+    // Ignore storage errors so builder still works in restricted contexts.
+  }
+}
+
+function loadPacks() {
+  try {
+    const raw = localStorage.getItem(packsKey);
+    if (!raw) {
+      return [];
+    }
+
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    // Drop malformed entries and any app slugs no longer in the catalog, so a
+    // pack saved against an older catalog still loads.
+    return parsed
+      .filter((pack) => pack && typeof pack.name === "string" && Array.isArray(pack.apps))
+      .map((pack) => ({
+        id: typeof pack.id === "string" ? pack.id : String(pack.savedAt ?? pack.name),
+        name: pack.name,
+        savedAt: typeof pack.savedAt === "number" ? pack.savedAt : 0,
+        apps: pack.apps.filter((slug) => apps.some((app) => app.slug === slug)),
+      }))
+      .filter((pack) => pack.apps.length);
+  } catch {
+    return [];
+  }
+}
+
+function savePacks() {
+  try {
+    localStorage.setItem(packsKey, JSON.stringify(savedPacks));
   } catch {
     // Ignore storage errors so builder still works in restricted contexts.
   }
@@ -951,6 +992,7 @@ function toggleApp(slug) {
 
   saveSelection();
   renderPresets();
+  renderSavedPacks();
   renderCatalog();
   renderSelection();
   setStatus("");
@@ -1021,6 +1063,128 @@ function renderPresets() {
       applyPreset(button.dataset.preset);
     });
   });
+}
+
+function formatSavedDate(savedAt) {
+  if (!savedAt) {
+    return "";
+  }
+
+  return new Date(savedAt).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function renderSavedPacks() {
+  if (!savedPacks.length) {
+    savedListNode.innerHTML = `<li class="saved-empty">No saved packs yet. Pick apps, then save.</li>`;
+    return;
+  }
+
+  savedListNode.innerHTML = savedPacks
+    .map((pack) => {
+      const isActive = sameSelection(pack.apps);
+      const date = formatSavedDate(pack.savedAt);
+      return `
+        <li class="${isActive ? "active" : ""}">
+          <div class="saved-meta">
+            <strong>${escapeHtml(pack.name)}</strong>
+            <span>${pack.apps.length} ${pack.apps.length === 1 ? "app" : "apps"}${date ? ` &middot; ${date}` : ""}</span>
+          </div>
+          <div class="saved-actions">
+            <button class="ghost-button" data-load="${escapeHtml(pack.id)}" type="button">
+              ${isActive ? "Loaded" : "Load"}
+            </button>
+            <button class="ghost-button" data-delete="${escapeHtml(pack.id)}" type="button">
+              Delete
+            </button>
+          </div>
+        </li>
+      `;
+    })
+    .join("");
+
+  savedListNode.querySelectorAll("[data-load]").forEach((button) => {
+    button.addEventListener("click", () => {
+      loadPack(button.dataset.load);
+    });
+  });
+
+  savedListNode.querySelectorAll("[data-delete]").forEach((button) => {
+    button.addEventListener("click", () => {
+      deletePack(button.dataset.delete);
+    });
+  });
+}
+
+function saveCurrentPack() {
+  if (!selected.size) {
+    setStatus("Pick at least one app before saving.");
+    return;
+  }
+
+  const name = window.prompt("Name this pack", `Pack ${savedPacks.length + 1}`);
+  if (name === null) {
+    return;
+  }
+
+  const trimmed = name.trim();
+  if (!trimmed) {
+    setStatus("Pack needs a name.");
+    return;
+  }
+
+  const existing = savedPacks.find((pack) => pack.name === trimmed);
+  if (existing && !window.confirm(`Replace saved pack "${trimmed}"?`)) {
+    return;
+  }
+
+  const pack = {
+    id: existing ? existing.id : `pack-${Date.now()}`,
+    name: trimmed,
+    savedAt: Date.now(),
+    apps: [...selected],
+  };
+
+  savedPacks = existing
+    ? savedPacks.map((item) => (item.id === existing.id ? pack : item))
+    : [pack, ...savedPacks];
+
+  savePacks();
+  renderSavedPacks();
+  setStatus(`Saved "${trimmed}".`);
+}
+
+function loadPack(id) {
+  const pack = savedPacks.find((item) => item.id === id);
+  if (!pack) {
+    return;
+  }
+
+  selected.clear();
+  pack.apps.forEach((slug) => {
+    selected.add(slug);
+  });
+
+  saveSelection();
+  renderPresets();
+  renderSavedPacks();
+  renderCatalog();
+  renderSelection();
+  setStatus(`Loaded "${pack.name}".`);
+}
+
+function deletePack(id) {
+  const pack = savedPacks.find((item) => item.id === id);
+  if (!pack || !window.confirm(`Delete saved pack "${pack.name}"?`)) {
+    return;
+  }
+
+  savedPacks = savedPacks.filter((item) => item.id !== id);
+  savePacks();
+  renderSavedPacks();
+  setStatus(`Deleted "${pack.name}".`);
 }
 
 function renderCatalog() {
@@ -1099,6 +1263,7 @@ function applyPreset(presetSlug) {
 
   saveSelection();
   renderPresets();
+  renderSavedPacks();
   renderCatalog();
   renderSelection();
   setStatus(`${preset.name} preset applied.`);
@@ -1108,9 +1273,14 @@ clearButton.addEventListener("click", () => {
   selected.clear();
   saveSelection();
   renderPresets();
+  renderSavedPacks();
   renderCatalog();
   renderSelection();
   setStatus("Selection cleared.");
+});
+
+saveButton.addEventListener("click", () => {
+  saveCurrentPack();
 });
 
 copyButton.addEventListener("click", () => {
@@ -1130,5 +1300,6 @@ searchInput.addEventListener("input", (event) => {
 
 renderFilters();
 renderPresets();
+renderSavedPacks();
 renderCatalog();
 renderSelection();

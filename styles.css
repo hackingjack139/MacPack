@@ -582,6 +582,85 @@ pre {
   border: 1px solid var(--line);
 }
 
+.saved-packs {
+  margin: 18px 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.saved-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.saved-header h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.saved-list {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 0;
+  display: grid;
+  gap: 10px;
+}
+
+.saved-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid var(--line);
+}
+
+.saved-list li.active {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.saved-meta {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.saved-meta strong {
+  font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.saved-meta span {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.saved-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.saved-actions .ghost-button {
+  padding: 8px 12px;
+  font-size: 0.82rem;
+}
+
+.saved-list li.saved-empty {
+  display: block;
+  font-size: 0.86rem;
+  color: var(--muted);
+  background: none;
+  border-style: dashed;
+}
+
 .label {
   margin: 0 0 10px;
   text-transform: uppercase;
