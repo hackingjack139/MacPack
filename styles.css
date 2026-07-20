@@ -557,6 +557,11 @@ pre {
   position: sticky;
   top: 24px;
   height: fit-content;
+  /* Sticky pins the top, so anything past the viewport is unreachable — with a
+     full pack the Copy and Download buttons fell below the fold on short
+     laptop viewports. Cap the height and let the panel scroll internally. */
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
 }
 
 .selection-header {
@@ -729,6 +734,14 @@ pre {
 
   .hero-card {
     transform: none;
+  }
+
+  /* Single column here, so the panel is no longer a sidebar. Let it flow with
+     the page instead of sticking and scrolling inside itself. */
+  .selection-panel {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
   }
 }
 
