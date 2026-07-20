@@ -268,6 +268,11 @@ pre {
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
   display: grid;
+  /* Cards are stretched to equal height by the grid, and two auto rows would
+     split that height between them — so a longer description stole pixels from
+     the button, leaving Designer's 10px shorter than the rest. Let the content
+     row absorb the slack and size the button to its own padding. */
+  grid-template-rows: 1fr auto;
   gap: 18px;
 }
 
