@@ -35,3 +35,17 @@ First version focuses on three things:
 ## Current Prototype
 
 Open [index.html](index.html) in browser to view first concept.
+
+## Checking the Catalog
+
+The catalog hardcodes Homebrew package names, and Homebrew renames things.
+A stale name still installs today — Homebrew follows the old alias — then
+fails once that alias is dropped, which takes the whole script down with it
+under `set -euo pipefail`.
+
+    node scripts/check-catalog.mjs
+
+Verifies every package still resolves under its current token and is not
+deprecated, and that presets, the default selection, and icon mappings only
+point at apps that exist. Exits 0 when clean, 1 on catalog problems, 2 if
+Homebrew is unavailable. Worth running before a release.
