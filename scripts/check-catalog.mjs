@@ -73,6 +73,39 @@ for (const slug of Object.keys(iconMap)) {
   }
 }
 
+// --- upstream icons (opt-in: --icons) -------------------------------------
+
+// simple-icons drops brand icons on trademark request, so a mapping that works
+// today can 404 later. A dead entry still renders (the UI falls back to
+// initials) but costs a request that can never succeed, so it is worth knowing.
+if (process.argv.includes("--icons")) {
+  const version = source.match(/const iconVersion = "([^"]+)"/)?.[1];
+  if (!version) {
+    problems.push("could not read iconVersion from app.js");
+  } else {
+    const entries = Object.entries(iconMap);
+    const results = await Promise.all(
+      entries.map(async ([slug, icon]) => {
+        const url = `https://cdn.jsdelivr.net/npm/simple-icons@${version}/icons/${icon}.svg`;
+        try {
+          const res = await fetch(url, { method: "HEAD" });
+          return { slug, icon, ok: res.ok };
+        } catch {
+          return { slug, icon, ok: null }; // network trouble, not a catalog fault
+        }
+      }),
+    );
+
+    if (results.some((r) => r.ok === null)) {
+      console.error("Warning: could not reach the icon CDN; skipping icon checks.\n");
+    } else {
+      for (const { slug, icon, ok } of results.filter((r) => !r.ok)) {
+        problems.push(`icon not found: ${slug} -> ${icon} (simple-icons@${version})`);
+      }
+    }
+  }
+}
+
 // --- upstream Homebrew ----------------------------------------------------
 
 // Homebrew aborts the whole batch when any one name is unknown, naming the

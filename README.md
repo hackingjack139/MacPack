@@ -49,3 +49,8 @@ Verifies every package still resolves under its current token and is not
 deprecated, and that presets, the default selection, and icon mappings only
 point at apps that exist. Exits 0 when clean, 1 on catalog problems, 2 if
 Homebrew is unavailable. Worth running before a release.
+
+Add `--icons` to also check every icon against the simple-icons CDN. Those
+rot too: simple-icons drops brand marks on trademark request, and a dead
+mapping costs a request that can never succeed. Apps with no mapping fall
+back to initials by design, which is why this is opt-in rather than default.

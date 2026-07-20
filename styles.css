@@ -303,7 +303,10 @@ pre {
   margin-top: 14px;
 }
 
-.preset-preview span {
+/* Direct children only. A descendant selector here also matched the nested
+   .app-icon-fallback span, which outranked its own `display: none` and painted
+   the initials on top of an icon that had loaded perfectly well. */
+.preset-preview > span {
   border-radius: 999px;
   padding: 7px 10px;
   background: rgba(148, 180, 159, 0.18);
