@@ -54,3 +54,7 @@ Add `--icons` to also check every icon against the simple-icons CDN. Those
 rot too: simple-icons drops brand marks on trademark request, and a dead
 mapping costs a request that can never succeed. Apps with no mapping fall
 back to initials by design, which is why this is opt-in rather than default.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
