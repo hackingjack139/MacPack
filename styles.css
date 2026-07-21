@@ -190,6 +190,12 @@ h1 span {
 
 pre {
   white-space: pre-wrap;
+  /* pre-wrap breaks on whitespace but never inside a token, and the generated
+     script carries a 66-character Homebrew URL with nothing to break on. Left
+     alone it pushed the script block far wider than its card. `anywhere` also
+     keeps the long token out of the container's min-content width, so the
+     panel cannot be stretched by it either. */
+  overflow-wrap: anywhere;
   font-size: 0.97rem;
   line-height: 1.6;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -567,6 +573,10 @@ pre {
      laptop viewports. Cap the height and let the panel scroll internally. */
   max-height: calc(100vh - 48px);
   overflow-y: auto;
+  /* Required, not redundant: setting only overflow-y makes overflow-x compute
+     to auto rather than staying visible, which let the panel scroll sideways
+     and carry the script card out over the catalog. */
+  overflow-x: hidden;
 }
 
 .selection-header {
