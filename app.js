@@ -1029,7 +1029,14 @@ function renderPresets() {
         .slice(0, 4)
         .map(getAppBySlug)
         .filter(Boolean);
-      const overflowCount = Math.max(preset.apps.length - previewApps.length, 0);
+      // Name the rest instead of counting them. The card already shows the total
+      // in the kicker, so "+4 more" only restated arithmetic the reader had —
+      // whereas Docker and Claude are the reason someone picks Developer.
+      const restNames = preset.apps
+        .slice(previewApps.length)
+        .map(getAppBySlug)
+        .filter(Boolean)
+        .map((app) => app.name);
       return `
         <article class="preset-card ${isActive ? "active" : ""}">
           <div>
@@ -1040,8 +1047,12 @@ function renderPresets() {
               ${previewApps
                 .map((app) => `<span>${renderAppLabel(app)}</span>`)
                 .join("")}
-              ${overflowCount ? `<span>+${overflowCount} more</span>` : ""}
             </div>
+            ${
+              restNames.length
+                ? `<p class="preset-rest">plus ${escapeHtml(restNames.join(", "))}</p>`
+                : ""
+            }
           </div>
           <button
             class="preset-button ${isActive ? "active" : ""}"
