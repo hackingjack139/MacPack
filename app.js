@@ -699,6 +699,7 @@ const searchInput = document.querySelector("#search-input");
 const filterGroup = document.querySelector("#filter-group");
 const statusMessage = document.querySelector("#status-message");
 const statCountNode = document.querySelector("#stat-count");
+const statCatalogNode = document.querySelector("#stat-catalog");
 const presetGrid = document.querySelector("#preset-grid");
 const saveButton = document.querySelector("#save-button");
 const savedListNode = document.querySelector("#saved-list");
@@ -1292,6 +1293,8 @@ searchInput.addEventListener("input", (event) => {
   saveSearch();
   renderCatalog();
 });
+
+statCatalogNode.textContent = String(apps.length);
 
 renderFilters();
 renderPresets();
