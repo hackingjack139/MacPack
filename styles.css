@@ -691,16 +691,22 @@ pre {
 
 .command-head {
   display: flex;
+  /* Wrap here rather than inside .command-actions: when the panel is too narrow
+     for label plus both buttons, the actions should drop below the label as a
+     group. Without this the buttons broke apart and stacked on top of each
+     other while the label squeezed into two lines. */
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: start;
-  gap: 16px;
+  gap: 12px 16px;
   margin-bottom: 12px;
 }
 
 .command-actions {
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
+  /* Keep the pair side by side; .command-head handles the narrow case. */
+  flex-wrap: nowrap;
 }
 
 .command-actions .ghost-button,
