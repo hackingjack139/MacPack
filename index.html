@@ -165,8 +165,11 @@
                   </button>
                 </div>
               </div>
-              <pre id="command-output">#!/usr/bin/env bash</pre>
+              <!-- Above the script, not below it: the generated script runs to
+                   about a thousand pixels, so feedback placed after it landed
+                   off-screen every time. -->
               <p id="status-message" class="status-message" aria-live="polite"></p>
+              <pre id="command-output">#!/usr/bin/env bash</pre>
             </div>
           </aside>
         </div>

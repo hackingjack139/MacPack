@@ -1249,12 +1249,28 @@ function renderCatalog() {
   });
 }
 
+let copyResetTimer = null;
+
+// The status line alone is easy to miss, since attention is on the button that
+// was just pressed. Flash the confirmation on the button itself too.
+function flashCopyButton(label) {
+  clearTimeout(copyResetTimer);
+  copyButton.textContent = label;
+  copyButton.classList.add("is-flashing");
+  copyResetTimer = setTimeout(() => {
+    copyButton.textContent = "Copy script";
+    copyButton.classList.remove("is-flashing");
+  }, 1600);
+}
+
 async function copyScript() {
   try {
     await navigator.clipboard.writeText(shellScriptText());
     setStatus("Script copied to clipboard.");
+    flashCopyButton("Copied");
   } catch {
     setStatus("Clipboard blocked. Copy from script panel instead.");
+    flashCopyButton("Copy failed");
   }
 }
 

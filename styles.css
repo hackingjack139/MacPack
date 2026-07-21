@@ -886,6 +886,12 @@ pre {
   flex-wrap: nowrap;
 }
 
+.command-actions .ghost-button.is-flashing {
+  background: var(--accent);
+  border-color: transparent;
+  color: white;
+}
+
 .command-actions .ghost-button,
 .command-actions .button {
   padding: 10px 14px;
@@ -893,7 +899,8 @@ pre {
 }
 
 .status-message {
-  margin: 12px 0 0;
+  /* Sits between the actions and the script now, so the spacing flipped. */
+  margin: 0 0 12px;
   color: rgb(var(--terminal-fg-rgb) / 0.78);
   min-height: 1.4em;
   font-size: 0.92rem;
