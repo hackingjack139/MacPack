@@ -275,7 +275,7 @@ pre {
   box-shadow: var(--shadow);
   display: grid;
   /* Cards are stretched to equal height by the grid, and two auto rows would
-     split that height between them — so a longer description stole pixels from
+     split that height between them, so a longer description stole pixels from
      the button, leaving Designer's 10px shorter than the rest. Let the content
      row absorb the slack and size the button to its own padding. */
   grid-template-rows: 1fr auto;
@@ -568,7 +568,7 @@ pre {
   position: sticky;
   top: 24px;
   height: fit-content;
-  /* Sticky pins the top, so anything past the viewport is unreachable — with a
+  /* Sticky pins the top, so anything past the viewport is unreachable. With a
      full pack the Copy and Download buttons fell below the fold on short
      laptop viewports. Cap the height and let the panel scroll internally. */
   max-height: calc(100vh - 48px);

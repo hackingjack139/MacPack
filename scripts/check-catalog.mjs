@@ -5,9 +5,9 @@
 //
 // Two kinds of check:
 //
-//   1. Internal — presets and the default selection only reference slugs that
+//   1. Internal: presets and the default selection only reference slugs that
 //      exist, no duplicate slugs, no icon mappings pointing at dead slugs.
-//   2. Upstream — every Homebrew package name still resolves, is spelled with
+//   2. Upstream: every Homebrew package name still resolves, is spelled with
 //      its current token, and is not deprecated or disabled.
 //
 // Homebrew silently follows renamed tokens, so a stale name installs fine today
@@ -132,7 +132,7 @@ function brewInfo(kind, names) {
       return { found: JSON.parse(raw)[key] ?? [], missing };
     } catch (error) {
       if (error.code === "ENOENT") {
-        throw error; // brew itself is absent — caller reports it
+        throw error; // brew itself is absent, caller reports it
       }
 
       const stderr = String(error.stderr ?? "");
