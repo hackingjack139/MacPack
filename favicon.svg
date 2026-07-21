@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Four app tiles in one rounded container: the pack.
+       Accent orange as the field rather than the ink: at 16px a dark mark
+       disappears into a dark tab bar, while orange holds in both themes.
+       Tiles are deliberately chunky, since thin gaps mud up at tab size.
+       (No double hyphens in here: XML forbids them inside a comment.) -->
+  <rect width="32" height="32" rx="7" fill="#ff6b2c" />
+  <g fill="#142218">
+    <rect x="6" y="6" width="9" height="9" rx="2.5" />
+    <rect x="17" y="6" width="9" height="9" rx="2.5" />
+    <rect x="6" y="17" width="9" height="9" rx="2.5" />
+    <rect x="17" y="17" width="9" height="9" rx="2.5" />
+  </g>
+</svg>
