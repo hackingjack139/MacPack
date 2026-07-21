@@ -322,15 +322,6 @@ pre {
   align-items: center;
 }
 
-/* Deliberately not a chip: these are named but not previewed, and styling them
-   as pills would read as more apps in the same rank as the four above. */
-.preset-rest {
-  margin: 10px 0 0;
-  font-size: 0.82rem;
-  line-height: 1.5;
-  color: var(--muted);
-}
-
 .preset-button {
   border: 1px solid var(--line);
   border-radius: 999px;

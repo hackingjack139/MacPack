@@ -1025,18 +1025,10 @@ function renderPresets() {
   presetGrid.innerHTML = presets
     .map((preset) => {
       const isActive = sameSelection(preset.apps);
-      const previewApps = preset.apps
-        .slice(0, 4)
-        .map(getAppBySlug)
-        .filter(Boolean);
-      // Name the rest instead of counting them. The card already shows the total
-      // in the kicker, so "+4 more" only restated arithmetic the reader had —
-      // whereas Docker and Claude are the reason someone picks Developer.
-      const restNames = preset.apps
-        .slice(previewApps.length)
-        .map(getAppBySlug)
-        .filter(Boolean)
-        .map((app) => app.name);
+      // Show the whole pack. Truncating meant either restating the count the
+      // kicker already gives, or trailing a text list whose position drifted
+      // with how many rows the chips happened to wrap to.
+      const packApps = preset.apps.map(getAppBySlug).filter(Boolean);
       return `
         <article class="preset-card ${isActive ? "active" : ""}">
           <div>
@@ -1044,15 +1036,10 @@ function renderPresets() {
             <h4>${escapeHtml(preset.name)}</h4>
             <p>${escapeHtml(preset.description)}</p>
             <div class="preset-preview" aria-label="${escapeHtml(preset.name)} apps">
-              ${previewApps
+              ${packApps
                 .map((app) => `<span>${renderAppLabel(app)}</span>`)
                 .join("")}
             </div>
-            ${
-              restNames.length
-                ? `<p class="preset-rest">plus ${escapeHtml(restNames.join(", "))}</p>`
-                : ""
-            }
           </div>
           <button
             class="preset-button ${isActive ? "active" : ""}"
