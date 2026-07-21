@@ -1,0 +1,44 @@
+name: Catalog
+
+# The catalog hardcodes Homebrew package names against an upstream that renames
+# and deprecates them. That rot is silent: a stale name still installs today and
+# only breaks once Homebrew drops the alias. The weekly run is the point of this
+# workflow; the push trigger just catches bad edits early.
+
+on:
+  push:
+    paths:
+      - "app.js"
+      - "scripts/check-catalog.mjs"
+      - ".github/workflows/catalog.yml"
+  pull_request:
+    paths:
+      - "app.js"
+      - "scripts/check-catalog.mjs"
+  schedule:
+    - cron: "0 9 * * 1" # Mondays, 09:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: catalog-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    # macOS so Homebrew is already installed. Free for public repositories.
+    runs-on: macos-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Check catalog
+        # Homebrew 4+ reads package metadata from the JSON API, so this sees
+        # current data without a slow `brew update`. --icons also checks the
+        # simple-icons mappings, and skips itself if the CDN is unreachable
+        # rather than failing the run on a network blip.
+        run: node scripts/check-catalog.mjs --icons
