@@ -682,6 +682,7 @@ const storageKey = "macpack-selection";
 const searchKey = "macpack-search";
 const filterKey = "macpack-filter";
 const packsKey = "macpack-packs";
+const themeKey = "macpack-theme";
 
 const selected = new Set(loadSelection());
 const categories = ["All", ...new Set(apps.map((app) => app.category))];
@@ -700,6 +701,7 @@ const filterGroup = document.querySelector("#filter-group");
 const statusMessage = document.querySelector("#status-message");
 const statCountNode = document.querySelector("#stat-count");
 const statCatalogNode = document.querySelector("#stat-catalog");
+const themeButtons = [...document.querySelectorAll("[data-theme-choice]")];
 const presetGrid = document.querySelector("#preset-grid");
 const saveButton = document.querySelector("#save-button");
 const savedListNode = document.querySelector("#saved-list");
@@ -1293,6 +1295,50 @@ searchInput.addEventListener("input", (event) => {
   saveSearch();
   renderCatalog();
 });
+
+// "system" is the absence of a data-theme attribute, so the stylesheet keeps
+// following prefers-color-scheme on its own. Light and dark pin it instead.
+// The matching pre-paint script in index.html applies a pinned theme before
+// first paint; this only has to keep the buttons in step and persist changes.
+function currentTheme() {
+  return document.documentElement.getAttribute("data-theme") ?? "system";
+}
+
+function applyTheme(choice) {
+  if (choice === "system") {
+    document.documentElement.removeAttribute("data-theme");
+  } else {
+    document.documentElement.setAttribute("data-theme", choice);
+  }
+
+  try {
+    if (choice === "system") {
+      localStorage.removeItem(themeKey);
+    } else {
+      localStorage.setItem(themeKey, choice);
+    }
+  } catch {
+    // Ignore storage errors so the switch still works in restricted contexts.
+  }
+
+  renderThemeSwitch();
+}
+
+function renderThemeSwitch() {
+  const active = currentTheme();
+  themeButtons.forEach((button) => {
+    const isActive = button.dataset.themeChoice === active;
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+}
+
+themeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    applyTheme(button.dataset.themeChoice);
+  });
+});
+
+renderThemeSwitch();
 
 statCatalogNode.textContent = String(apps.length);
 

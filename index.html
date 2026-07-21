@@ -18,10 +18,28 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
+    <script>
+      // Runs before first paint so a pinned theme does not flash the other one.
+      // No stored choice means no attribute, which leaves the CSS following the
+      // system preference on its own.
+      try {
+        var saved = localStorage.getItem("macpack-theme");
+        if (saved === "light" || saved === "dark") {
+          document.documentElement.setAttribute("data-theme", saved);
+        }
+      } catch (error) {
+        // Storage can be blocked; the system preference still applies.
+      }
+    </script>
   </head>
   <body>
     <div class="noise"></div>
     <main class="shell">
+      <div class="theme-switch" role="group" aria-label="Colour theme">
+        <button type="button" data-theme-choice="system">System</button>
+        <button type="button" data-theme-choice="light">Light</button>
+        <button type="button" data-theme-choice="dark">Dark</button>
+      </div>
       <section class="hero">
         <div class="hero-copy">
           <p class="eyebrow">Mac setup, compressed.</p>

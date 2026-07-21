@@ -31,8 +31,13 @@
   --terminal-bar: #4f5d4f;
 }
 
+/* The dark values live here once and are emitted twice below: CSS cannot share a
+   declaration block between a media query and a plain selector. Both copies are
+   generated from the same source, so they cannot drift apart. */
+
+/* System preference, unless the visitor has pinned light. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #0f1410;
     --bg-top: #151c15;
     --panel: rgba(28, 36, 29, 0.74);
@@ -60,6 +65,36 @@
     /* Below the page background, so the script card still reads as inset. */
     --terminal-bg: #080b08;
   }
+}
+
+/* Explicit choice from the theme switch. */
+:root[data-theme="dark"] {
+    --bg: #0f1410;
+    --bg-top: #151c15;
+    --panel: rgba(28, 36, 29, 0.74);
+    --ink: #e9e4da;
+    --muted: #a8b5a8;
+    --line: rgba(233, 228, 218, 0.14);
+    /* Nudged brighter: #ff6b2c is fine on cream but sits heavy on near-black. */
+    --accent: #ff7a42;
+    --accent-dark: #ff6b2c;
+    --shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+
+    /* Sage rather than white, so translucent surfaces lift off the background
+       instead of blowing out to grey. */
+    --surface-rgb: 76 90 76;
+    --accent-rgb: 255 122 66;
+    --grid-rgb: 233 228 218;
+
+    --icon-tile: rgb(226 222 212 / 0.9);
+
+    /* Same glows at light-mode strength washed the whole page brown: a 20%
+       orange veil is a warm tint over cream but dominates over near-black. */
+    --glow-warm: rgb(var(--accent-rgb) / 0.07);
+    --glow-cool: rgb(var(--tint-rgb) / 0.05);
+
+    /* Below the page background, so the script card still reads as inset. */
+    --terminal-bg: #080b08;
 }
 
 * {
@@ -96,6 +131,46 @@ body {
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
   padding: 32px 0 56px;
+}
+
+/* Sits above the hero rather than fixed to the viewport: the page has no nav
+   bar to pin it to, and fixed positioning would float it over the catalog. */
+.theme-switch {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.theme-switch button {
+  border: 1px solid var(--line);
+  background: rgb(var(--surface-rgb) / 0.45);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.theme-switch button:hover {
+  color: var(--ink);
+}
+
+.theme-switch button[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: transparent;
+  color: var(--bg);
+}
+
+.theme-switch button:focus-visible {
+  outline: 2px solid rgb(var(--accent-rgb) / 0.4);
+  outline-offset: 2px;
 }
 
 .hero {
