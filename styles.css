@@ -723,6 +723,44 @@ pre {
   gap: 10px;
 }
 
+.selection-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.selection-remove {
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--muted);
+  border-radius: 999px;
+  width: 22px;
+  height: 22px;
+  line-height: 1;
+  font-size: 1rem;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.selection-remove:hover {
+  background: var(--accent);
+  border-color: transparent;
+  color: white;
+}
+
+.selection-remove:focus-visible {
+  outline: 2px solid rgb(var(--accent-rgb) / 0.4);
+  outline-offset: 2px;
+}
+
 .selection-list li {
   display: flex;
   justify-content: space-between;

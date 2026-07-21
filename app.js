@@ -971,11 +971,32 @@ function renderSelection() {
   selectionNode.innerHTML = picked.length
     ? picked
         .map(
-          (app) =>
-            `<li>${renderAppLabel(app)}<span>${escapeHtml(app.category)}</span></li>`,
+          (app) => `
+            <li>
+              ${renderAppLabel(app)}
+              <span class="selection-meta">
+                <span>${escapeHtml(app.category)}</span>
+                <button
+                  class="selection-remove"
+                  type="button"
+                  data-remove="${escapeHtml(app.slug)}"
+                  aria-label="Remove ${escapeHtml(app.name)} from your pack"
+                  title="Remove ${escapeHtml(app.name)}"
+                >&times;</button>
+              </span>
+            </li>
+          `,
         )
         .join("")
     : `<li><span>No apps yet</span><span>Pick from left</span></li>`;
+
+  // Removing from here is the only way to drop a single app without hunting it
+  // down again in the catalog, which matters most right after loading a preset.
+  selectionNode.querySelectorAll("[data-remove]").forEach((button) => {
+    button.addEventListener("click", () => {
+      toggleApp(button.dataset.remove);
+    });
+  });
 
   const command = shellScriptText();
   commandNode.textContent = command;
