@@ -112,6 +112,14 @@ const apps = [
     homepage: "https://zed.dev",
   },
   {
+    name: "Xcode",
+    slug: "xcode",
+    category: "Dev",
+    description: "Apple's IDE and toolchain for macOS and iOS development.",
+    install: { kind: "mas", package: "497799835" },
+    homepage: "https://developer.apple.com/xcode/",
+  },
+  {
     name: "Node.js",
     slug: "nodejs",
     category: "Dev",
@@ -312,6 +320,33 @@ const apps = [
     homepage: "https://rectangleapp.com",
   },
   {
+    name: "Magnet",
+    slug: "magnet",
+    category: "Utility",
+    description: "Window snapping with keyboard shortcuts and screen zones.",
+    install: { kind: "mas", package: "441258766" },
+    homepage: "https://magnet.crowdcafe.com",
+  },
+  {
+    name: "Amphetamine",
+    slug: "amphetamine",
+    category: "Utility",
+    description: "Keeps the Mac awake on schedules, triggers, and app rules.",
+    install: { kind: "mas", package: "937984704" },
+    homepage: "https://apps.apple.com/app/amphetamine/id937984704",
+  },
+  {
+    name: "Ice",
+    slug: "ice",
+    category: "Utility",
+    description: "Menu bar manager for hiding and rearranging status items.",
+    install: {
+      kind: "download",
+      url: "https://github.com/jordanbaird/Ice/releases/latest/download/Ice.zip",
+    },
+    homepage: "https://icemenubar.app",
+  },
+  {
     name: "Bartender",
     slug: "bartender",
     category: "Utility",
@@ -454,6 +489,14 @@ const apps = [
     description: "Calendar command center for scheduling and time blocking.",
     install: { kind: "cask", package: "fantastical" },
     homepage: "https://flexibits.com/fantastical",
+  },
+  {
+    name: "Things 3",
+    slug: "things-3",
+    category: "Productivity",
+    description: "Task manager with a calm daily agenda and fast capture.",
+    install: { kind: "mas", package: "904280696" },
+    homepage: "https://culturedcode.com/things/",
   },
   {
     name: "ChatGPT",
@@ -863,6 +906,18 @@ function renderAppIcon(app) {
   `;
 }
 
+// "mas" is the tool's name, not something a visitor should have to know.
+const installLabels = {
+  cask: "Cask",
+  formula: "Formula",
+  mas: "App Store",
+  download: "Direct",
+};
+
+function installLabel(app) {
+  return installLabels[app.install.kind] ?? app.install.kind;
+}
+
 function renderAppLabel(app) {
   return `
     <span class="app-label">
@@ -915,6 +970,8 @@ function shellScriptText() {
   const formulae = picked
     .filter((app) => app.install.kind === "formula")
     .map((app) => app.install.package);
+  const storeApps = picked.filter((app) => app.install.kind === "mas");
+  const downloads = picked.filter((app) => app.install.kind === "download");
 
   const lines = [
     "#!/usr/bin/env bash",
@@ -950,6 +1007,85 @@ function shellScriptText() {
 
   if (casks.length) {
     lines.push("", `echo "Installing apps..."`, `brew install --cask ${casks.join(" ")}`);
+  }
+
+  if (storeApps.length) {
+    lines.push(
+      "",
+      'echo "Installing App Store apps..."',
+      "if ! command -v mas >/dev/null 2>&1; then",
+      "  brew install mas",
+      "fi",
+      "",
+      "# mas needs the App Store to be signed in. Report and carry on rather than",
+      "# letting one unavailable item take the rest of the pack down with it.",
+      `for store_id in ${storeApps.map((app) => app.install.package).join(" ")}; do`,
+      '  mas install "$store_id" || echo "  App Store item $store_id failed. Is the App Store signed in?" >&2',
+      "done",
+    );
+  }
+
+  if (downloads.length) {
+    lines.push(
+      "",
+      'echo "Installing direct downloads..."',
+      "",
+      "# Not every Mac app is in Homebrew or the App Store. Unpack a .zip or .dmg",
+      "# into /Applications, and skip that one app if anything goes wrong.",
+      "macpack_install_download() {",
+      '  local app_name="$1"',
+      '  local app_url="$2"',
+      "  local work_dir payload found_app mount_point",
+      "  # Must start empty: without this a later app that fails to unpack would",
+      "  # still see the previous app's path and copy that one twice.",
+      '  found_app=""',
+      '  echo "  $app_name"',
+      "",
+      '  work_dir="$(mktemp -d)"',
+      '  payload="$work_dir/payload"',
+      "",
+      '  if ! curl -fsSL "$app_url" -o "$payload"; then',
+      '    echo "    download failed, skipping $app_name" >&2',
+      '    rm -rf "$work_dir"',
+      "    return 0",
+      "  fi",
+      "",
+      '  case "$(file -b --mime-type "$payload")" in',
+      "    application/zip)",
+      '      unzip -qq "$payload" -d "$work_dir/unpacked" || true',
+      '      found_app="$(find "$work_dir/unpacked" -maxdepth 2 -name "*.app" -print -quit)"',
+      "      ;;",
+      "    application/x-apple-diskimage)",
+      '      mount_point="$work_dir/mount"',
+      '      mkdir -p "$mount_point"',
+      '      if hdiutil attach -nobrowse -quiet -mountpoint "$mount_point" "$payload"; then',
+      '        found_app="$(find "$mount_point" -maxdepth 2 -name "*.app" -print -quit)"',
+      '        if [ -n "$found_app" ]; then',
+      '          cp -R "$found_app" /Applications/ || true',
+      "        fi",
+      '        hdiutil detach -quiet "$mount_point" || true',
+      "        found_app=\"\"",
+      "      else",
+      '        echo "    could not mount $app_name, skipping" >&2',
+      "      fi",
+      "      ;;",
+      "    *)",
+      '      echo "    unrecognised download for $app_name, skipping" >&2',
+      "      ;;",
+      "  esac",
+      "",
+      '  if [ -n "${found_app:-}" ]; then',
+      '    cp -R "$found_app" /Applications/ || echo "    could not copy $app_name" >&2',
+      "  fi",
+      "",
+      '  rm -rf "$work_dir"',
+      "}",
+      "",
+      ...downloads.map(
+        (app) =>
+          `macpack_install_download ${JSON.stringify(app.name)} ${JSON.stringify(app.install.url)}`,
+      ),
+    );
   }
 
   if (!picked.length) {
@@ -1230,7 +1366,7 @@ function renderCatalog() {
           </header>
           <p>${escapeHtml(app.description)}</p>
           <footer>
-            <span>${escapeHtml(app.install.kind)}</span>
+            <span>${escapeHtml(installLabel(app))}</span>
             <a href="${app.homepage}" target="_blank" rel="noreferrer">Site</a>
           </footer>
         </article>

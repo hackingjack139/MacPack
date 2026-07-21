@@ -154,9 +154,80 @@ function brewInfo(kind, names) {
 const casks = apps.filter((a) => a.install.kind === "cask").map((a) => a.install.package);
 const formulae = apps.filter((a) => a.install.kind === "formula").map((a) => a.install.package);
 
-const unknownKinds = apps.filter((a) => !["cask", "formula"].includes(a.install.kind));
-for (const app of unknownKinds) {
+const KINDS = ["cask", "formula", "mas", "download"];
+for (const app of apps.filter((a) => !KINDS.includes(a.install.kind))) {
   problems.push(`${app.slug}: unsupported install kind "${app.install.kind}"`);
+}
+
+// Each kind identifies its app differently, so check the right field is present.
+for (const app of apps) {
+  const { kind, package: pkg, url } = app.install;
+  if (kind === "download" && !url) {
+    problems.push(`${app.slug}: download entries need a url`);
+  }
+  if (["cask", "formula", "mas"].includes(kind) && !pkg) {
+    problems.push(`${app.slug}: ${kind} entries need a package`);
+  }
+  if (kind === "mas" && pkg && !/^\d+$/.test(pkg)) {
+    problems.push(`${app.slug}: App Store id should be numeric, got "${pkg}"`);
+  }
+}
+
+// --- App Store ids -------------------------------------------------------
+
+// Apple's public lookup endpoint, so this needs no mas install and no account.
+// A pulled app returns resultCount 0, which is exactly the rot worth catching.
+const storeApps = apps.filter((a) => a.install.kind === "mas" && /^\d+$/.test(a.install.package));
+if (storeApps.length) {
+  const results = await Promise.all(
+    storeApps.map(async (app) => {
+      const url = `https://itunes.apple.com/lookup?id=${app.install.package}&country=us&entity=macSoftware`;
+      try {
+        const res = await fetch(url);
+        if (!res.ok) return { app, ok: null };
+        const body = await res.json();
+        return { app, ok: body.resultCount > 0, name: body.results?.[0]?.trackName };
+      } catch {
+        return { app, ok: null };
+      }
+    }),
+  );
+
+  if (results.some((r) => r.ok === null)) {
+    console.error("Warning: could not reach the App Store lookup service; skipping those checks.\n");
+  } else {
+    for (const { app, ok } of results.filter((r) => !r.ok)) {
+      problems.push(`App Store id not found: ${app.slug} -> ${app.install.package}`);
+    }
+  }
+}
+
+// --- Direct download urls -------------------------------------------------
+
+const downloads = apps.filter((a) => a.install.kind === "download" && a.install.url);
+if (downloads.length) {
+  const results = await Promise.all(
+    downloads.map(async (app) => {
+      try {
+        // Some hosts reject HEAD, so fall back to a ranged GET.
+        let res = await fetch(app.install.url, { method: "HEAD", redirect: "follow" });
+        if (!res.ok) {
+          res = await fetch(app.install.url, { headers: { Range: "bytes=0-0" }, redirect: "follow" });
+        }
+        return { app, ok: res.ok, status: res.status };
+      } catch {
+        return { app, ok: null };
+      }
+    }),
+  );
+
+  if (results.some((r) => r.ok === null)) {
+    console.error("Warning: could not reach a download host; skipping those checks.\n");
+  } else {
+    for (const { app, status } of results.filter((r) => !r.ok)) {
+      problems.push(`download url failed: ${app.slug} -> HTTP ${status}`);
+    }
+  }
 }
 
 let checked = 0;
