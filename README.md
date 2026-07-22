@@ -81,6 +81,18 @@ Re-downloads them. Run it after adding an app or bumping `iconVersion`. Apps
 with no mapping fall back to their initials by design: simple-icons drops brand
 marks on trademark request, so a fair few Mac apps have no icon upstream.
 
+## Fonts
+
+Space Grotesk and Instrument Serif are served from `fonts/` rather than Google
+Fonts, so the page needs no third-party host at run time. Only the latin ranges
+and the weights the stylesheet actually uses are shipped, and Space Grotesk is a
+variable font, so 400 and 700 share one file.
+
+    node scripts/fetch-fonts.mjs
+
+Re-downloads them and regenerates `fonts/fonts.css`. Both families are under the
+SIL Open Font License; see [fonts/OFL.txt](fonts/OFL.txt).
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
