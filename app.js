@@ -670,6 +670,8 @@ const presets = [
   },
 ];
 
+// Which simple-icons release the files in icons/ came from. Read by
+// scripts/fetch-icons.mjs; bump it and re-run that script to refresh them.
 const iconVersion = "16.15.0";
 const iconMap = {
   arc: "arc",
@@ -881,9 +883,9 @@ function getAppInitials(app) {
 
 function getAppIconUrl(app) {
   const iconSlug = iconMap[app.slug];
-  return iconSlug
-    ? `https://cdn.jsdelivr.net/npm/simple-icons@${iconVersion}/icons/${iconSlug}.svg`
-    : "";
+  // Served from the repo, not a CDN: setting up a Mac is exactly when the
+  // network is least reliable, and a missing icon used to mean initials.
+  return iconSlug ? `./icons/${iconSlug}.svg` : "";
 }
 
 function renderAppIcon(app) {

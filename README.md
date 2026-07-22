@@ -68,10 +68,18 @@ and that presets, the default selection, and icon mappings only point at apps
 that exist. Exits 0 when clean, 1 on catalog problems, 2 if
 Homebrew is unavailable. Worth running before a release.
 
-Add `--icons` to also check every icon against the simple-icons CDN. Those
-rot too: simple-icons drops brand marks on trademark request, and a dead
-mapping costs a request that can never succeed. Apps with no mapping fall
-back to initials by design, which is why this is opt-in rather than default.
+## Icons
+
+App icons ship in `icons/`, taken from simple-icons at the release recorded in
+`iconVersion`. They are vendored rather than loaded from a CDN because setting
+up a Mac is exactly when the network is least reliable, and a failed icon
+request used to leave the whole catalog showing initials.
+
+    node scripts/fetch-icons.mjs
+
+Re-downloads them. Run it after adding an app or bumping `iconVersion`. Apps
+with no mapping fall back to their initials by design: simple-icons drops brand
+marks on trademark request, so a fair few Mac apps have no icon upstream.
 
 ## License
 
