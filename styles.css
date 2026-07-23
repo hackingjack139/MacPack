@@ -555,7 +555,9 @@ pre {
 
 .filter-chip.active {
   background: var(--ink);
-  color: white;
+  /* Paired with --ink, not a literal white: in dark mode --ink is a light
+     cream, so white text on it was nearly invisible. */
+  color: var(--bg);
   border-color: transparent;
 }
 
