@@ -380,19 +380,10 @@ pre {
   margin-bottom: 18px;
 }
 
-.builder-copy {
-  margin-top: 12px;
-}
-
 .preset-strip {
   display: grid;
   gap: 16px;
   margin-bottom: 22px;
-}
-
-.preset-copy h3 {
-  font-size: clamp(1.4rem, 3vw, 2.2rem);
-  margin: 0;
 }
 
 .preset-grid {
