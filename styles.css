@@ -135,27 +135,35 @@ body {
 
 /* Sits above the hero rather than fixed to the viewport: the page has no nav
    bar to pin it to, and fixed positioning would float it over the catalog. */
+/* One segmented control, not three loose buttons: the choices are mutually
+   exclusive, so they should read as a single control with one active segment,
+   the way the macOS appearance picker does. */
 .theme-switch {
+  /* Block-level flex, not inline-flex: margin-left:auto only right-aligns a
+     block box. On an inline box the auto margin is dropped and it drifts left. */
   display: flex;
-  justify-content: flex-end;
-  gap: 6px;
-  margin-bottom: 8px;
+  margin: 0 0 8px auto;
+  width: fit-content;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgb(var(--surface-rgb) / 0.45);
+  backdrop-filter: blur(12px);
 }
 
 .theme-switch button {
-  border: 1px solid var(--line);
-  background: rgb(var(--surface-rgb) / 0.45);
+  border: 0;
+  background: none;
   color: var(--muted);
   border-radius: 999px;
-  padding: 6px 12px;
+  padding: 5px 14px;
   font: inherit;
   font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
   transition:
     background 160ms ease,
-    color 160ms ease,
-    border-color 160ms ease;
+    color 160ms ease;
 }
 
 .theme-switch button:hover {
@@ -164,7 +172,6 @@ body {
 
 .theme-switch button[aria-pressed="true"] {
   background: var(--ink);
-  border-color: transparent;
   color: var(--bg);
 }
 
